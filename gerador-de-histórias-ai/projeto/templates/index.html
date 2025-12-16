@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Histórias Aleatórias</title>
+    
+    <!-- Link para o CSS externo -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Gerador de Histórias Aleatórias</h1>
+            <p>Cada clique, uma nova aventura mágica!</p>
+        </div>
+
+        <div class="content">
+            <div class="btn-container">
+                <button id="btnGerar" onclick="gerarHistoria()">
+                    <span><span class="emoji">🎲</span>Gerar História Aleatória</span>
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">Criando sua história mágica...</p>
+                <p style="color: #999; margin-top: 10px; font-size: 0.95em;">
+                    A IA está trabalhando em algo especial para você ✨
+                </p>
+            </div>
+
+            <div class="result" id="result">
+                <div class="tema-badge" id="temaBadge">
+                    📚 Tema: Carregando...
+                </div>
+                
+                <div class="story-container" id="storyContainer">
+                    <h2>📖 Sua História:</h2>
+                    <div class="story-text" id="storyText"></div>
+                    <div class="continuar-mensagem" id="continuarMensagem" style="display: none;">
+                        <span class="emoji-badge">✨💭✨</span>
+                        <div>E se a história continuasse? O que aconteceria depois?</div>
+                        <div class="subtexto">Continue essa aventura na sua imaginação!</div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-new" onclick="gerarHistoria()">
+                        <span><span class="emoji">✨</span>Gerar Nova História</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <strong>💡 Dica:</strong> Cada história é única e gerada por Inteligência Artificial!
+            </div>
+        </div>
+    </div>
+
+    <!-- Link para o JavaScript externo -->
+    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+</body>
+</html>
