@@ -19,7 +19,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Chave da API do Google Gemini
-GOOGLE_API_KEY = "AIzaSyBfLZmDqbNHo6LaO2-Eu6JvVe__5I9NAA0"
+GOOGLE_API_KEY = "AIzaSyBi-Pv2mUcVWPMZoDBkVA7LOPF_jpBpKnM"
 
 # Lista de modelos em ordem de prioridade
 MODELOS = [
@@ -209,4 +209,5 @@ async def listar_temas():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
