@@ -6,22 +6,17 @@ import httpx
 import random
 import logging
 
-# Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Gerador de Histórias Aleatórias")
 
-# Montar pasta static para servir CSS e JS
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Configurar templates
 templates = Jinja2Templates(directory="templates")
 
-# Chave da API do Google Gemini
 GOOGLE_API_KEY = "AIzaSyBi-Pv2mUcVWPMZoDBkVA7LOPF_jpBpKnM"
 
-# Lista de modelos em ordem de prioridade
 MODELOS = [
     "gemini-2.0-flash",
     "gemini-flash-latest",
@@ -29,7 +24,6 @@ MODELOS = [
     "gemini-flash-lite-latest"
 ]
 
-# Temas aleatórios
 TEMAS = [
     "um astronauta perdido em um planeta desconhecido",
     "uma bruxa que perdeu seus poderes mágicos",
@@ -211,3 +205,4 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
