@@ -1,4 +1,4 @@
-/* Reset e configurações globais */
+
 * {
     margin: 0;
     padding: 0;
@@ -15,7 +15,6 @@ body {
     justify-content: center;
 }
 
-/* Container principal */
 .container {
     max-width: 900px;
     width: 100%;
@@ -37,7 +36,6 @@ body {
     }
 }
 
-/* Header */
 .header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -56,12 +54,10 @@ body {
     opacity: 0.95;
 }
 
-/* Conteúdo */
 .content {
     padding: 50px 40px;
 }
 
-/* Botões */
 .btn-container {
     text-align: center;
     margin-bottom: 30px;
@@ -120,7 +116,6 @@ button span {
     z-index: 1;
 }
 
-/* Loading */
 .loading {
     display: none;
     text-align: center;
@@ -152,7 +147,6 @@ button span {
     font-weight: 600;
 }
 
-/* Resultado */
 .result {
     display: none;
     margin-top: 30px;
@@ -208,7 +202,6 @@ button span {
     text-align: justify;
 }
 
-/* Mensagem de continuação */
 .continuar-mensagem {
     margin-top: 30px;
     padding: 20px 30px;
@@ -247,7 +240,6 @@ button span {
     font-style: normal;
 }
 
-/* Erros */
 .error {
     background: #ffe0e0;
     border-left-color: #ff4444;
@@ -257,7 +249,6 @@ button span {
     color: #cc0000;
 }
 
-/* Botão de nova história */
 .btn-new {
     margin-top: 25px;
     background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
@@ -268,7 +259,6 @@ button span {
     box-shadow: 0 10px 30px rgba(67, 233, 123, 0.6);
 }
 
-/* Estatísticas */
 .stats {
     text-align: center;
     margin-top: 20px;
@@ -279,7 +269,6 @@ button span {
     color: #666;
 }
 
-/* Emoji */
 .emoji {
     font-size: 1.3em;
     margin-right: 8px;
@@ -307,4 +296,5 @@ button span {
     .story-text {
         font-size: 1em;
     }
+
 }
