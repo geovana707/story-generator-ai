@@ -2,10 +2,10 @@ GERADOR DE HISTÓRIAS COM INTELIGÊNCIA ARTIFICIAL
 Trabalho desenvolvido para a disciplina de Programação Web
  Professor: Charleno
 Participantes:
- Geovana Vitória Gomes Rodrigues
- Thyago Lima Negreiro
- Kauan Gomes Soares
- Iasmyn Cristyne Castro Lima
+ Geovana Vitória Gomes Rodrigues,
+ Thyago Lima Negreiro,
+ Kauan Gomes Soares,
+ Iasmyn Cristyne Castro Lima,
  Luis Gabriel Rodrigues de Sousa
 Turma:
  2º ano B – Informática
