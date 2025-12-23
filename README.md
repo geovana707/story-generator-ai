@@ -6,7 +6,7 @@ Participantes:
  Thyago Lima Negreiro,
  Kauan Gomes Soares,
  Iasmyn Cristyne Castro Lima,
- Luis Gabriel Rodrigues de Sousa
+ Luis Gabriel Rodrigues de Sousa.
 Turma:
  2º ano B – Informática
 
