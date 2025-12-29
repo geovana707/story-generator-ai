@@ -15,7 +15,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-GOOGLE_API_KEY = "AIzaSyBi-Pv2mUcVWPMZoDBkVA7LOPF_jpBpKnM"
+GOOGLE_API_KEY = "AIzaSyAlAZJilvWqL44gijInBhSbbxG2DwCQ29I"
 
 MODELOS = [
     "gemini-2.0-flash",
@@ -205,4 +205,5 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
