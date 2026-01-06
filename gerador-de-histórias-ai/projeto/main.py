@@ -15,14 +15,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-GOOGLE_API_KEY = "AIzaSyCHlSXOfrOFmheB3-PjMXx87X3vfhscAds"
+GOOGLE_API_KEY = "AIzaSyDAXss-0lpnWq8UR_I-uL8yWJKUZAgmqqw"
 
-MODELOS = [
-    "gemini-2.0-flash",
-    "gemini-flash-latest",
-    "gemini-2.5-flash-lite",
-    "gemini-flash-lite-latest"
-]
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 TEMAS = [
     "um astronauta perdido em um planeta desconhecido",
@@ -52,55 +47,14 @@ async def home(request: Request):
     """Página inicial"""
     return templates.TemplateResponse("index.html", {"request": request})
 
-async def tentar_gerar_com_modelo(modelo: str, prompt: str, client: httpx.AsyncClient):
-    """Tenta gerar história com um modelo específico"""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent"
-    
-    try:
-        response = await client.post(
-            f"{url}?key={GOOGLE_API_KEY}",
-            json={
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {
-                    "temperature": 0.8,
-                    "topK": 40,
-                    "topP": 0.95,
-                    "maxOutputTokens": 3000,
-                    "stopSequences": []
-                },
-                "safetySettings": [
-                    {
-                        "category": "HARM_CATEGORY_HARASSMENT",
-                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        "category": "HARM_CATEGORY_HATE_SPEECH",
-                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-                    },
-                    {
-                        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-                    }
-                ]
-            }
-        )
-        return response, modelo
-    except Exception as e:
-        logger.error(f"Erro com {modelo}: {str(e)}")
-        return None, modelo
-
 @app.post("/gerar-historia")
 async def gerar_historia():
-    """Gerar história aleatória"""
+    """Gerar história aleatória usando APENAS gemini-2.5-flash"""
     try:
         tema = random.choice(TEMAS)
         num_paragrafos = random.randint(3, 7)
         
-        logger.info(f"Gerando história: {num_paragrafos} parágrafos sobre {tema}")
+        logger.info(f"🎲 Gerando história: {num_paragrafos} parágrafos sobre '{tema}'")
         
         prompt = f"""Você é um excelente escritor de histórias criativas e envolventes. 
 
@@ -122,79 +76,116 @@ Cada parágrafo deve ter 4-6 frases. Separe os parágrafos com linha em branco.
 IMPORTANTE: Termine a história de forma definitiva no último parágrafo. O leitor deve sentir que a história teve um encerramento claro."""
 
         async with httpx.AsyncClient(timeout=45.0) as client:
-            response = None
-            modelo_usado = None
+            response = await client.post(
+                f"{GEMINI_API_URL}?key={GOOGLE_API_KEY}",
+                json={
+                    "contents": [{
+                        "parts": [{
+                            "text": prompt
+                        }]
+                    }],
+                    "generationConfig": {
+                        "temperature": 0.8,
+                        "topK": 40,
+                        "topP": 0.95,
+                        "maxOutputTokens": 3000,
+                        "stopSequences": []
+                    },
+                    "safetySettings": [
+                        {
+                            "category": "HARM_CATEGORY_HARASSMENT",
+                            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_HATE_SPEECH",
+                            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                        }
+                    ]
+                }
+            )
             
-            for modelo in MODELOS:
-                logger.info(f"Tentando modelo: {modelo}")
-                response, modelo_usado = await tentar_gerar_com_modelo(modelo, prompt, client)
+            logger.info(f"📡 Status da API: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response and response.status_code == 200:
-                    logger.info(f"✅ Sucesso com modelo: {modelo}")
-                    break
-                elif response and response.status_code == 429:
-                    logger.warning(f"⚠️ Quota excedida para {modelo}, tentando próximo...")
-                    continue
-            
-            if not response or response.status_code != 200:
+                if "candidates" not in data or len(data["candidates"]) == 0:
+                    logger.error("❌ Resposta sem candidatos - possível bloqueio de segurança")
+                    return {
+                        "success": False,
+                        "error": "Conteúdo bloqueado por filtros de segurança",
+                        "details": "Tente gerar novamente."
+                    }
+                
+                candidate = data["candidates"][0]
+                finish_reason = candidate.get("finishReason", "UNKNOWN")
+                
+                logger.info(f"✅ Finish reason: {finish_reason}")
+                
+                if finish_reason == "SAFETY":
+                    return {
+                        "success": False,
+                        "error": "História bloqueada por filtros de segurança",
+                        "details": "Tente outro tema clicando novamente."
+                    }
+                
+                historia = candidate["content"]["parts"][0]["text"]
+                
+                paragrafos = [p.strip() for p in historia.split('\n\n') if p.strip()]
+                total_paragrafos = len(paragrafos)
+                
+                logger.info(f"✨ História gerada com sucesso! {total_paragrafos} parágrafos, {len(historia)} caracteres")
+                
+                return {
+                    "success": True,
+                    "historia": historia,
+                    "tema": tema,
+                    "paragrafos": total_paragrafos,
+                    "mostrar_continuar": total_paragrafos >= 7
+                }
+                
+            elif response.status_code == 429:
+                logger.error("⚠️ Limite de quota atingido!")
                 return {
                     "success": False,
-                    "error": "Todos os modelos atingiram o limite de quota",
-                    "details": "Por favor, tente novamente mais tarde."
+                    "error": "Limite de requisições atingido",
+                    "details": "Você atingiu o limite diário da API gratuita. Tente novamente mais tarde (após 21h horário de Brasília) ou amanhã."
                 }
-            
-            data = response.json()
-            
-            if "candidates" not in data or len(data["candidates"]) == 0:
+            else:
+                logger.error(f"❌ Erro na API: {response.status_code}")
                 return {
                     "success": False,
-                    "error": "Conteúdo bloqueado por filtros de segurança",
-                    "details": "Tente gerar novamente."
+                    "error": f"Erro na API: {response.status_code}",
+                    "details": response.text
                 }
-            
-            candidate = data["candidates"][0]
-            finish_reason = candidate.get("finishReason", "UNKNOWN")
-            
-            if finish_reason == "SAFETY":
-                return {
-                    "success": False,
-                    "error": "História bloqueada por filtros de segurança",
-                    "details": "Tente outro tema."
-                }
-            
-            historia = candidate["content"]["parts"][0]["text"]
-            paragrafos = [p.strip() for p in historia.split('\n\n') if p.strip()]
-            total_paragrafos = len(paragrafos)
-            
-            logger.info(f"História gerada com {total_paragrafos} parágrafos usando {modelo_usado}")
-            
-            return {
-                "success": True,
-                "historia": historia,
-                "tema": tema,
-                "paragrafos": total_paragrafos,
-                "mostrar_continuar": total_paragrafos >= 7,
-                "modelo_usado": modelo_usado
-            }
                 
     except httpx.TimeoutException:
-        logger.error("Timeout na requisição")
+        logger.error("⏱️ Timeout na requisição para API")
         return {
             "success": False,
-            "error": "Timeout na conexão",
-            "details": "A API demorou muito para responder."
+            "error": "Tempo esgotado",
+            "details": "A API demorou muito para responder. Tente novamente."
         }
     except Exception as e:
-        logger.error(f"Erro inesperado: {str(e)}")
+        logger.error(f"💥 Erro inesperado: {str(e)}")
         return {
             "success": False,
-            "error": str(e)
+            "error": "Erro inesperado no servidor",
+            "details": str(e)
         }
 
 @app.get("/health")
 async def health_check():
     """Endpoint de verificação de saúde"""
-    return {"status": "ok", "message": "Servidor funcionando!"}
+    return {"status": "ok", "message": "Servidor funcionando!", "modelo": "gemini-2.5-flash"}
 
 @app.get("/temas-disponiveis")
 async def listar_temas():
@@ -203,8 +194,8 @@ async def listar_temas():
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 
 
