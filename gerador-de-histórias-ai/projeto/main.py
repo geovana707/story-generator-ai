@@ -15,7 +15,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-GOOGLE_API_KEY = "AIzaSyDAXss-0lpnWq8UR_I-uL8yWJKUZAgmqqw"
+GOOGLE_API_KEY = "AIzaSyAExyb2j8lpX7lGRfAUaZpf-DQZR_KqAwo"
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
@@ -195,6 +195,7 @@ async def listar_temas():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 
 
